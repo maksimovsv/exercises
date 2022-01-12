@@ -108,7 +108,10 @@ subString :: Int -> Int -> [Char] -> [Char]
 subString start end str = 
     if end < 0 || (start > end)
     then ""
-    else take (end-start+1) (drop start str)
+    else 
+        if start < 0
+        then subString 0 end str
+        else take (end-start+1) (drop start str)
 
 {- | Write a function that takes a String — space separated numbers,
 and finds a sum of the numbers inside this string.
