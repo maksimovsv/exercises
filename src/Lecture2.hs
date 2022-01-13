@@ -61,8 +61,11 @@ lazyProduct (x : xs)
 "ccaabb"
 -}
 duplicate :: [a] -> [a]
+duplicate list = concatMap (replicate 2) list
+{-
 duplicate []     = []
 duplicate (x:xs) = x : x : duplicate xs
+-}
 
 {- | Implement function that takes index and a list and removes the
 element at the given position. Additionally, this function should also
@@ -85,7 +88,8 @@ lists of even lengths.
 ♫ NOTE: Use eta-reduction and function composition (the dot (.) operator)
   in this function.
 -}
-evenLists = error "TODO"
+evenLists :: [[a]] -> [[a]]
+evenLists list = filter (\x -> mod (length x) 2 == 0) list
 
 {- | The @dropSpaces@ function takes a string containing a single word
 or number surrounded by spaces and removes all leading and trailing
