@@ -64,10 +64,6 @@ lazyProduct (x : xs)
 -}
 duplicate :: [a] -> [a]
 duplicate list = concatMap (replicate 2) list
-{-
-duplicate []     = []
-duplicate (x:xs) = x : x : duplicate xs
--}
 
 {- | Implement function that takes index and a list and removes the
 element at the given position. Additionally, this function should also
@@ -96,7 +92,7 @@ lists of even lengths.
   in this function.
 -}
 evenLists :: [[a]] -> [[a]]
-evenLists list = filter (\x -> mod (length x) 2 == 0) list
+evenLists = filter (even . length)
 
 {- | The @dropSpaces@ function takes a string containing a single word
 or number surrounded by spaces and removes all leading and trailing
@@ -130,6 +126,9 @@ As a reward, the knight can take the treasure chest.
 Below is the description of the fight and character specifications:
 
   * A chest contains a non-zero amount of gold and a possible treasure.
+    When defining the type of a treasure chest, you don't know what
+    treasures it stores insight, so your chest data type must be able
+    to contain any possible treasure.
   * As a reward, knight takes all the gold, the treasure and experience.
   * Experience is calculated based on the dragon type. A dragon can be
     either red, black or green.
