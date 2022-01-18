@@ -208,7 +208,17 @@ verify that.
 [1,2,3,4,7]
 -}
 merge :: [Int] -> [Int] -> [Int]
-merge = error "TODO"
+merge x1 x2 = go [] x1 x2
+    where
+        go :: [Int] -> [Int] -> [Int] -> [Int]
+        go list [] [] = list
+        go list [x] [] = go (list ++ [x]) [] []
+        go list [] [y] = go (list ++ [y]) [] []
+        go list (x:xs) (y:ys) = 
+            if x <= y 
+            then go (list++[x])  xs (y:ys) 
+            else go (list++[y]) (x:xs) ys
+ 
 
 {- | Implement the "Merge Sort" algorithm in Haskell. The @mergeSort@
 function takes a list of numbers and returns a new list containing the
@@ -225,7 +235,9 @@ The algorithm of merge sort is the following:
 [1,2,3]
 -}
 mergeSort :: [Int] -> [Int]
-mergeSort = error "TODO"
+mergeSort [] = []
+mergeSort [x] = [x]
+
 
 
 {- | Haskell is famous for being a superb language for implementing
