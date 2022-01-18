@@ -214,6 +214,8 @@ merge x1 x2 = go [] x1 x2
         go list [] [] = list
         go list [x] [] = go (list ++ [x]) [] []
         go list [] [y] = go (list ++ [y]) [] []
+        go list x [] = go (list ++ x) [] []
+        go list [] y = go (list ++ y) [] []
         go list (x:xs) (y:ys) = 
             if x <= y 
             then go (list++[x])  xs (y:ys) 
@@ -237,6 +239,11 @@ The algorithm of merge sort is the following:
 mergeSort :: [Int] -> [Int]
 mergeSort [] = []
 mergeSort [x] = [x]
+mergeSort list = merge (mergeSort left) (mergeSort right)
+  where 
+    halfLen = div (length list) 2
+    left = take halfLen list
+    right = drop halfLen list
 
 
 
