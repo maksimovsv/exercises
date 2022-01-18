@@ -77,7 +77,7 @@ return the removed element.
 -}
 removeAt :: Int -> [a] -> (Maybe a, [a])
 removeAt ind list = 
-    if ind >= (length list)
+    if ind >= (length list) || ind < 0
     then (Nothing, list)
     else 
         let (left, right) = splitAt ind list in (Just (list!!ind), left ++ tail right)
