@@ -172,6 +172,32 @@ data Knight = Knight
     , knightEndurance :: Int
     }
 
+-- mine code start
+
+data Chest a = MkChest
+  {
+    chestGold :: Int,
+    chestTreasure :: a
+  }
+  deriving Show
+
+data DragonType = 
+  DragonRed |
+  DragonBlack |
+  DragonGreen
+  deriving Show
+
+type Experince = Int
+
+getExperienceByDragon :: DragonType -> Experince
+getExperienceByDragon dragon = case dragon of 
+  DragonRed -> 100
+  DragonBlack -> 150
+  DragonGreen -> 250
+
+-- mine code end
+
+
 dragonFight = error "TODO"
 
 ----------------------------------------------------------------------------
@@ -296,8 +322,25 @@ data EvalError
 {- | Having all this set up, we can finally implement an evaluation function.
 It returns either a successful evaluation result or an error.
 -}
+
+getResultInt :: Maybe Int -> Int
+getResultInt (Just n) = n
+
+-- eval [("x", 15), ("y", 7)] (Add (Var "y") (Add (Var "x") (Lit 10))) 
+-- `shouldBe` Right 32
+
+myAdd :: Either EvalError Int -> Either EvalError Int -> Either EvalError Int
+myAdd (Right x) (Right y) = Right (x+y)
+myAdd (Left (VariableNotFound str)) _ = Left (VariableNotFound str)
+myAdd _ (Left (VariableNotFound str)) = Left (VariableNotFound str)
+
 eval :: Variables -> Expr -> Either EvalError Int
-eval = error "TODO"
+eval vars expr = case expr of
+  Lit x -> Right x
+  Var x -> 
+    let result = lookup x vars
+    in (if (result == Nothing) then Left (VariableNotFound x) else Right (getResultInt result))
+  Add expr1 expr2 -> myAdd (eval vars expr1) (eval vars expr2)
 
 {- | Compilers also perform optimizations! One of the most common
 optimizations is "Constant Folding". It performs arithmetic operations
