@@ -271,8 +271,6 @@ mergeSort list = merge (mergeSort left) (mergeSort right)
     left = take halfLen list
     right = drop halfLen list
 
-
-
 {- | Haskell is famous for being a superb language for implementing
 compilers and interpeters to other programming languages. In the next
 tasks, you need to implement a tiny part of a compiler.
@@ -326,13 +324,10 @@ It returns either a successful evaluation result or an error.
 getResultInt :: Maybe Int -> Int
 getResultInt (Just n) = n
 
--- eval [("x", 15), ("y", 7)] (Add (Var "y") (Add (Var "x") (Lit 10))) 
--- `shouldBe` Right 32
-
-myAdd :: Either EvalError Int -> Either EvalError Int -> Either EvalError Int
-myAdd (Right x) (Right y) = Right (x+y)
-myAdd (Left (VariableNotFound str)) _ = Left (VariableNotFound str)
-myAdd _ (Left (VariableNotFound str)) = Left (VariableNotFound str)
+sumEither :: Either EvalError Int -> Either EvalError Int -> Either EvalError Int
+sumEither (Right x) (Right y) = Right (x+y)
+sumEither (Left (VariableNotFound str)) _ = Left (VariableNotFound str)
+sumEither _ (Left (VariableNotFound str)) = Left (VariableNotFound str)
 
 eval :: Variables -> Expr -> Either EvalError Int
 eval vars expr = case expr of
@@ -340,7 +335,7 @@ eval vars expr = case expr of
   Var x -> 
     let result = lookup x vars
     in (if (result == Nothing) then Left (VariableNotFound x) else Right (getResultInt result))
-  Add expr1 expr2 -> myAdd (eval vars expr1) (eval vars expr2)
+  Add expr1 expr2 -> sumEither (eval vars expr1) (eval vars expr2)
 
 {- | Compilers also perform optimizations! One of the most common
 optimizations is "Constant Folding". It performs arithmetic operations
@@ -363,5 +358,36 @@ x + 45 + y
 Write a function that takes and expression and performs "Constant
 Folding" optimization on the given expression.
 -}
+
+-- constantFolding ( Add ( Add (Var "x") (Lit 7)) ( Add (Var "y") (Lit 2)) )
+-- `isOneOf` exprPermutations (Var "x") (Var "y") (Lit 9)
+
+{-
+f acc list expr = case expr of
+  Lit x -> (acc + x) list
+  Var x -> acc list ++ [x]
+
+  case expr of
+  Lit x -> myFold x []
+  Var x -> myFold 0 [x]
+  Add expr1 expr2 -> myFold 0 [] (constantFolding expr1) (myFold 0 [] (constantFolding expr2))
+-}
+
+showResult :: (Int , [String]) -> Expr
+showResult (acc, []) = Lit acc
+showResult (0, [x]) = Var x
+showResult (acc, [x]) = Add (Lit acc) (Var x)
+showResult (0, [x,y]) = Add (Var x) (Var y)
+showResult (acc, x:y:xs) = Add (Lit acc) (showResult (0, x:y:xs))
+
+sumFold :: (Int , [String]) -> Int -> [String] -> (Int , [String])
+sumFold (acc, list) lit var = (acc + lit, list ++ var)
+
+myFold :: (Int , [String]) -> Expr -> (Int, [String])
+myFold stack expr = case expr of
+  Lit x -> sumFold stack x []
+  Var x -> sumFold stack 0 [x]
+  Add expr1 expr2 -> myFold (myFold stack expr1) expr2
+
 constantFolding :: Expr -> Expr
-constantFolding = error "TODO"
+constantFolding expr = showResult (myFold (0,[]) expr)
