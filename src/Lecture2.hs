@@ -172,7 +172,7 @@ data Knight = Knight
     , knightEndurance :: Int
     }
 
--- mine code start
+-- mine code start, dragonFight still NOT IMPLEMENTED
 
 data Chest a = MkChest
   {
